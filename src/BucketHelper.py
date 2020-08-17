@@ -72,6 +72,12 @@ class BucketHelper:
             self.s3.Object(self.bucket_name, language + '/' + year + '/' + month + '/').put(Body='')
             self.get_bucket_tree()
 
+    def upload_daily_data(self, file_path):
+        today = date.today()
+        language = "it"
+        (year, month, day) = str(today).split("-")
 
-def upload_daily_data(self):
-    pass
+        self.update_bucket_structure("it")
+        print("uploading current day to S3")
+        self.s3.Object(self.bucket_name, language + '/' + year + '/' + month + '/' + day + ".csv").put(
+            Body=open(file_path))

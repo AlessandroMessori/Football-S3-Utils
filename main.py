@@ -1,6 +1,13 @@
+import json
 from src.BucketHelper import BucketHelper
 
-bucket_helper = BucketHelper("football-news")
+with open('./dags/utils/config.json', 'r') as f:
+    config = json.load(f)
+    bucket_helper = BucketHelper("football-news")
 
-bucket_helper.update_bucket_structure("en")
-# bucket_helper.list_bucket_structure()
+    languages = config["languages"]
+
+    for lan in languages:
+        print(lan)
+        bucket_helper.update_bucket_structure(lan['id'])
+        bucket_helper.upload_daily_data("/usr/local/airflow/data/" + lan['name'] + ".csv", lan['id'])

@@ -31,3 +31,6 @@ __pycache__
 
 dags/scraper/
 dags/s3Utils
+
+*.json
+cred.py

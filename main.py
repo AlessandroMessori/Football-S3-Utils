@@ -1,7 +1,7 @@
 import json
 from src.BucketHelper import BucketHelper
 
-with open('./dags/utils/config.json', 'r') as f:
+with open('/usr/local/airflow/config.json', 'r') as f:
     config = json.load(f)
     bucket_helper = BucketHelper("football-news")
 

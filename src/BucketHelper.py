@@ -91,16 +91,17 @@ class BucketHelper:
             except RequestException as e:
                 print(e)
 
-    '''def upload_daily_data(self, file_path, language):
+    def upload_daily_data(self, file_path, language):
         today = date.today()
         (year, month, day) = str(today).split("-")
 
         self.update_bucket_structure(language)
-        print("uploading current day to S3")
-        boto3.client('s3').upload_file(file_path, self.bucket_name,
-                                       language + '/' + year + '/' + month + '/' + day + ".csv")
-        '''
 
+        with open(file_path) as fh:
+            file_content = fh.read()
+            print("uploading current day to S3")
+            request("PUT",
+                    "https://" + self.bucket_name + ".s3.amazonaws.com" + '/' + language + '/' + year + '/' + month + '/' + day + '.csv',
+                    data=file_content,
+                    params={'file': file_path})
 
-bucket_helper = BucketHelper("football-news")
-bucket_helper.print_bucket_tree(bucket_helper.get_bucket_tree())

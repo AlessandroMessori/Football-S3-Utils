@@ -1,4 +1,6 @@
-import boto3
+from requests import request
+from requests.exceptions import RequestException
+import xml.etree.ElementTree as ET
 from datetime import date
 
 
@@ -6,16 +8,24 @@ class BucketHelper:
 
     def __init__(self, bucket_name):
         self.bucket_name = bucket_name
-        self.s3 = boto3.resource('s3')
-        self.bucket = self.s3.Bucket(bucket_name)
+        self.objects = list()
+        self.get_objects()
         self.bucket_tree = self.get_bucket_tree()
+
+    def get_objects(self):
+        response = request("GET", "https://" + self.bucket_name + ".s3.amazonaws.com")
+
+        root = ET.fromstring(response.text)
+
+        for item in root:
+            for sub_item in item:
+                if sub_item.tag[-3:] == "Key":
+                    self.objects.append(sub_item.text)
 
     def get_bucket_tree(self):
         bucket_tree = dict()
-        self.bucket = boto3.resource('s3').Bucket(self.bucket_name)
 
-        for bucket_object in self.bucket.objects.all():
-            full_object_name = bucket_object.key
+        for full_object_name in self.objects:
             # print(full_object_name)
             tree_level = full_object_name.count('/')
 
@@ -64,15 +74,24 @@ class BucketHelper:
 
         if year not in self.bucket_tree[language]:
             print("adding current year and month to folder structure...")
-            self.s3.Object(self.bucket_name, language + '/' + year + '/').put(Body='')
-            self.s3.Object(self.bucket_name, language + '/' + year + '/' + month + '/').put(Body='')
-            self.get_bucket_tree()
+            try:
+                request("PUT", "https://" + self.bucket_name + ".s3.amazonaws.com" + language + '/' + year + '/')
+                request("PUT",
+                        "https://" + self.bucket_name + ".s3.amazonaws.com" + language + '/' + year + '/' + month + '/')
+                self.get_bucket_tree()
+            except RequestException as e:
+                print(e)
         elif month not in self.bucket_tree[language][year]:
             print("adding current month to folder structure...")
-            self.s3.Object(self.bucket_name, language + '/' + year + '/' + month + '/').put(Body='')
-            self.get_bucket_tree()
+            try:
+                request("PUT",
+                        "https://" + self.bucket_name + ".s3.amazonaws.com" + '/' + language + '/' + year + '/' + month + '/',
+                        params={'body': ''})
+                self.get_bucket_tree()
+            except RequestException as e:
+                print(e)
 
-    def upload_daily_data(self, file_path, language):
+    '''def upload_daily_data(self, file_path, language):
         today = date.today()
         (year, month, day) = str(today).split("-")
 
@@ -80,3 +99,8 @@ class BucketHelper:
         print("uploading current day to S3")
         boto3.client('s3').upload_file(file_path, self.bucket_name,
                                        language + '/' + year + '/' + month + '/' + day + ".csv")
+        '''
+
+
+bucket_helper = BucketHelper("football-news")
+bucket_helper.print_bucket_tree(bucket_helper.get_bucket_tree())

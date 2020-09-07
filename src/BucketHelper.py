@@ -24,6 +24,7 @@ class BucketHelper:
 
     def get_bucket_tree(self):
         bucket_tree = dict()
+        print(self.objects)
 
         for full_object_name in self.objects:
             # print(full_object_name)
@@ -42,7 +43,7 @@ class BucketHelper:
                 month = full_object_name.split("/")[2]
                 bucket_tree[language][year][month] = list()
             elif tree_level == 4:
-                language = full_object_name.split("/")[0]
+                language = f<ull_object_name.split("/")[0]
                 year = full_object_name.split("/")[1]
                 month = full_object_name.split("/")[2]
                 day = full_object_name.split("/")[3]

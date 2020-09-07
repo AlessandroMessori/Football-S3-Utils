@@ -102,6 +102,5 @@ class BucketHelper:
             print("uploading current day to S3")
             request("PUT",
                     "https://" + self.bucket_name + ".s3.amazonaws.com" + '/' + language + '/' + year + '/' + month + '/' + day + '.csv',
-                    data=file_content,
+                    data=file_content.encode('utf-8'),
                     params={'file': file_path})
-

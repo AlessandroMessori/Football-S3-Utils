@@ -43,7 +43,7 @@ class BucketHelper:
                 month = full_object_name.split("/")[2]
                 bucket_tree[language][year][month] = list()
             elif tree_level == 4:
-                language = f<ull_object_name.split("/")[0]
+                language = f < ull_object_name.split("/")[0]
                 year = full_object_name.split("/")[1]
                 month = full_object_name.split("/")[2]
                 day = full_object_name.split("/")[3]
@@ -76,9 +76,11 @@ class BucketHelper:
         if year not in self.bucket_tree[language]:
             print("adding current year and month to folder structure...")
             try:
-                request("PUT", "https://" + self.bucket_name + ".s3.amazonaws.com" + language + '/' + year + '/')
+                request("PUT", "https://" + self.bucket_name + ".s3.amazonaws.com/" + language + '/' + year + '/',
+                        params={'body': ''})
                 request("PUT",
-                        "https://" + self.bucket_name + ".s3.amazonaws.com" + language + '/' + year + '/' + month + '/')
+                        "https://" + self.bucket_name + ".s3.amazonaws.com/" + language + '/' + year + '/' + month + '/',
+                        params={'body': ''})
                 self.get_bucket_tree()
             except RequestException as e:
                 print(e)
@@ -86,7 +88,7 @@ class BucketHelper:
             print("adding current month to folder structure...")
             try:
                 request("PUT",
-                        "https://" + self.bucket_name + ".s3.amazonaws.com" + '/' + language + '/' + year + '/' + month + '/',
+                        "https://" + self.bucket_name + ".s3.amazonaws.com/" + language + '/' + year + '/' + month + '/',
                         params={'body': ''})
                 self.get_bucket_tree()
             except RequestException as e:
